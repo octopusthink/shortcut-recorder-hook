@@ -6,7 +6,7 @@
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
   "repository": {
-    "url": "https://github.com/BlazeStorm001/shortcut-recorder-hook.git"
+    "url": "git+https://github.com/BlazeStorm001/shortcut-recorder-hook.git"
   },
   "files": [
     "dist"
