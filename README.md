@@ -1,6 +1,6 @@
 # use-shortcut-recorder
 
-A React hook for capturing keyboard shortcuts in your applications.
+A React hook for capturing and recording keyboard shortcuts in your applications. Designed specifically for seamless integration with Webview-based desktop frameworks like Electron, Tauri, and more, making shortcut registration effortless.
 
 ## Demo
 
