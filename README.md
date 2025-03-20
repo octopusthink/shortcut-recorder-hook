@@ -51,7 +51,7 @@ function ShortcutInput() {
     onChange: (newShortcut: string[]) => {
       console.log('Shortcut changed:', newShortcut);
     },
-    maxKeys: 2
+    maxKeys: 4
   });
 
   return (
