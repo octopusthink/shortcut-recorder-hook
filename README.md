@@ -24,6 +24,7 @@ npm install use-shortcut-recorder
 ## Usage
 
 ```jsx
+
 import { useShortcutRecorder } from 'use-shortcut-recorder';
 
 
@@ -37,13 +38,20 @@ function ShortcutInput() {
     startRecording,
     stopRecording,
     resetRecording,
-    clearLastRecording
+    clearLastRecording,
   } = useShortcutRecorder({
     onChange: (newShortcut) => {
       console.log('Shortcut changed:', newShortcut);
     },
-    maxKeys: 4
-  });
+    excludedKeys: ['KeyA', 'KeyB'], 
+    excludedShortcuts: [
+        ['Alt', 'KeyM'],
+        ['Meta', 'KeyZ']
+    ],
+    excludedModKeys: ['Control'],
+    maxModKeys: 3,
+    minModKeys: 1,
+  } );
 
   return (
     <div>
@@ -76,6 +84,7 @@ function ShortcutInput() {
     </div>
   );
 }
+
 
 ```
 
