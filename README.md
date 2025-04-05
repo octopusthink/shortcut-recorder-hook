@@ -1,6 +1,6 @@
 # useShortcutRecorder
 
-A React hook that allows easy capture of keyboard shortcuts with customizable configurations.
+A React hook for capturing and recording keyboard shortcuts in your applications. Designed specifically for seamless integration with Webview-based desktop frameworks like Electron, Tauri, and more, making shortcut registration effortless.
 
 ## Features
 
@@ -38,15 +38,8 @@ function ShortcutInput() {
     onChange: (newShortcut) => {
       console.log('Shortcut changed:', newShortcut);
     },
-    excludedKeys: ['KeyA', 'KeyB'], 
-    excludedShortcuts: [
-        ['Alt', 'KeyM'],
-        ['Meta', 'KeyZ']
-    ],
-    excludedModKeys: ['Control'],
-    maxModKeys: 3,
-    minModKeys: 1,
-  } );
+    maxKeys: 4
+  });
 
   return (
     <div>
