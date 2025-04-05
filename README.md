@@ -11,6 +11,10 @@ A React hook for capturing and recording keyboard shortcuts in your applications
   - Excluded shortcut combinations
 - TypeScript support 
 
+## Demo
+
+https://stackblitz.com/edit/react-brtovrsp?file=Shortcut.jsx
+
 ## Installation
 
 ```bash
