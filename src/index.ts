@@ -1,1 +1,1 @@
-export { default as useShortcutRecorder } from './useShortcutRecorder';
+export { default as useShortcutRecorder } from './hook';

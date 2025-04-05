@@ -1,6 +1,6 @@
 {
   "name": "use-shortcut-recorder",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "A React hook for capturing keyboard shortcuts",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -29,12 +29,19 @@
   "author": "Namit Arora",
   "license": "MIT",
   "devDependencies": {
+    "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.1.2",
-    "@types/react": "^19.0.12",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/react": "^16.3.0",
+    "@types/jest": "^29.5.14",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.1",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "rollup": "^2.79.2",
     "rollup-plugin-peer-deps-external": "^2.2.4",
-    "@rollup/plugin-terser": "0.4.4",
+    "ts-jest": "^29.3.1",
     "tslib": "^2.8.1",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.3"
   }
 }

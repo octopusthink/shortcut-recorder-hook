@@ -1,10 +1,15 @@
-# use-shortcut-recorder
+# useShortcutRecorder
 
-A React hook for capturing keyboard shortcuts in your applications.
+A React hook that allows easy capture of keyboard shortcuts with customizable configurations.
 
-## Demo
+## Features
 
-https://stackblitz.com/edit/react-brtovrsp?file=Shortcut.jsx
+- Record keyboard shortcuts with modifier keys (Ctrl, Alt, Shift, Meta/Command)
+- Customizable validation rules:
+  - Min/max number of modifier keys
+  - Excluded keys and modifiers
+  - Excluded shortcut combinations
+- TypeScript support 
 
 ## Installation
 
@@ -14,89 +19,118 @@ npm install use-shortcut-recorder
 
 ## Usage
 
-```
+```jsx
 import { useShortcutRecorder } from 'use-shortcut-recorder';
+
 
 function ShortcutInput() {
 
-  // Keys Formatter for display
-  const formatKeys = (keys: string[]) => {
-    const keyMap: Record<string, string> = {
-        Control: 'CTRL',
-        Meta: navigator.platform.includes('Mac') ? 'CMD' : 'WIN',
-        Alt: navigator.platform.includes('Mac') ? 'OPTION' : 'ALT',
-        ArrowUp: '↑',
-        ArrowDown: '↓',
-        ArrowLeft: '←',
-        ArrowRight: '→',
-        ' ': 'SPACE',
-        Escape: 'ESC'
-      };
-    
-    return keys.map(key => keyMap[key] || key.toUpperCase()).join(' + ');
-
-  };
-  
-  // Initialize the hook with an onChange handler
   const {
+    shortcut,
     savedShortcut,
     isRecording,
     error,
     startRecording,
     stopRecording,
     resetRecording,
-    inputProps
+    clearLastRecording
   } = useShortcutRecorder({
-    keyFormatter: formatKeys,
-    onChange: (newShortcut: string[]) => {
+    onChange: (newShortcut) => {
       console.log('Shortcut changed:', newShortcut);
     },
-    maxKeys: 2
-  });
+    excludedKeys: ['KeyA', 'KeyB'], 
+    excludedShortcuts: [
+        ['Alt', 'KeyM'],
+        ['Meta', 'KeyZ']
+    ],
+    excludedModKeys: ['Control'],
+    maxModKeys: 3,
+    minModKeys: 1,
+  } );
 
   return (
     <div>
-      <label htmlFor="shortcut-input">Keyboard Shortcut:</label>
-      
+      <label htmlFor="shortcut-input">Enter Shortcut:</label>
+
       <input
         id="shortcut-input"
         type="text"
-        className={`shortcut-input ${isRecording ? 'recording' : ''} ${error ? 'error' : ''}`}
-        placeholder= {isRecording ? 'Key Recording Started..': 'Click to Record Shortcut..'}
-        {...inputProps}
+        className='shortcut-input'
+        placeholder={
+          isRecording ? 'Key Recording Started..' : 'Click to Record Shortcut..'
+        }
+        onFocus={startRecording}
+        onClick={startRecording}
+        onBlur={() => stopRecording()}
+        value={isRecording 
+          ? shortcut.join(' + ') 
+          : savedShortcut.join(' + ')}
+        readOnly={true}
       />
-      
-      {error && <div>{error}</div>}
-      
-      
+
+      {error && <div>{error.message}</div>}
+
       {savedShortcut && (
         <div>
-          Current shortcut: <strong>{formatKeys(savedShortcut)}</strong>
+          Saved Shortcut: <strong>{savedShortcut.join(' + ')}</strong>
         </div>
       )}
+       <button onClick={clearLastRecording}>Reset</button>
     </div>
   );
 }
 
-export default ShortcutInput;
 ```
-## Options
 
-| Option      | Type     | Default                        | Description                          |
-|------------|---------|--------------------------------|--------------------------------------|
-| onChange   | Function | `() => {}`                     | Callback when shortcut changes      |
-| keyFormatter | Function | `(keys) => keys.join(' + ')`  | Formats the shortcut keys for display |
-| maxKeys    | Number   | `4`                            | Maximum number of keys allowed      |
+## API Reference
 
-## Return Values
+### Hook Options
 
-| Property        | Type      | Description                                    |
-|---------------|----------|------------------------------------------------|
-| savedShortcut | Array    | The current saved shortcut keys                |
-| isRecording   | Boolean  | Whether the hook is currently recording       |
-| error         | String   | Any validation errors                          |
-| startRecording | Function | Start recording a new shortcut                |
-| stopRecording | Function | Stop recording without saving                  |
-| resetRecording | Function | Reset the current recording                   |
-| inputProps    | Object   | Props to spread on an input element            |
+The `useShortcutRecorder` hook accepts a configuration object with the following properties:
 
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `onChange` | `(keys: string[]) => void` | `() => {}` | Callback function called when a valid shortcut is recorded |
+| `excludedShortcuts` | `string[][]` | `[[]]` | Array of shortcut combinations to exclude |
+| `excludedModKeys` | `string[]` | `[]` | Array of modifier keys to exclude |
+| `excludedKeys` | `string[]` | `[]` | Array of non-modifier keys to exclude |
+| `minModKeys` | `number` | `0` | Minimum number of modifier keys required |
+| `maxModKeys` | `number` | `4` | Maximum number of modifier keys allowed |
+
+### Return Values
+
+The hook returns an object with the following properties:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `shortcut` | `string[]` | Current shortcut being recorded |
+| `savedShortcut` | `string[]` | Last successfully recorded shortcut |
+| `isRecording` | `boolean` | Whether the recorder is currently active |
+| `error` | `ShortcutRecorderError` | Current error state |
+| `startRecording` | `() => void` | Function to start recording |
+| `stopRecording` | `() => void` | Function to stop recording |
+| `resetRecording` | `() => void` | Function to reset current recording |
+| `resetRecording` | `() => void` | Function to clear saved shortcut |
+
+### Error Codes
+
+The `error` object contains a code and message. Possible error codes:
+
+| Error Code | Description |
+|------------|-------------|
+| `NONE` | No error |
+| `MAX_MOD_KEYS_EXCEEDED` | Too many modifier keys used |
+| `MIN_MOD_KEYS_REQUIRED` | Not enough modifier keys used |
+| `MOD_KEY_NOT_ALLOWED` | Modifier key is in the excluded list |
+| `KEY_NOT_ALLOWED` | Non-modifier key is in the excluded list |
+| `SHORTCUT_NOT_ALLOWED` | Shortcut combination is in the excluded list |
+
+
+## Keyboard Code Reference
+
+The hook uses [keyboard event codes](https://www.toptal.com/developers/keycode/table) to identify keys. Note that the **left and right modifier keys  are considered the same** when recording a shortcut (for example ShiftLeft and ShiftRight are treated as Shift).
+
+
+## License
+
+MIT
