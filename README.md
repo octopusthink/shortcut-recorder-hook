@@ -113,7 +113,7 @@ The hook returns an object with the following properties:
 | `startRecording` | `() => void` | Function to start recording |
 | `stopRecording` | `() => void` | Function to stop recording |
 | `resetRecording` | `() => void` | Function to reset current recording |
-| `resetRecording` | `() => void` | Function to clear saved shortcut |
+| `clearLastRecording` | `() => void` | Function to clear saved shortcut |
 
 ### Error Codes
 
