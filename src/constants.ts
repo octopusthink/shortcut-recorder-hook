@@ -20,6 +20,8 @@ export const MOD_KEYS_MAP: Record<string, string> = {
     AltRight: 'Alt',
     MetaLeft: 'Meta',
     MetaRight: 'Meta',
+    OSLeft: 'Meta',
+    OSRight: 'Meta',
     Control: 'Control',
     Meta: 'Meta',
     Shift: 'Shift',

@@ -131,7 +131,7 @@ The `error` object contains a code and message. Possible error codes:
 
 ## Keyboard Code Reference
 
-The hook uses [keyboard event codes](https://www.toptal.com/developers/keycode/table) to identify keys. Note that the **left and right modifier keys  are considered the same** when recording a shortcut (for example ShiftLeft and ShiftRight are treated as Shift).
+This hook uses [keyboard event codes](https://www.toptal.com/developers/keycode/table) for key identification. For consistency and cross-browser compatibility, all left/right variations of modifier keys (e.g., `ShiftLeft`/`ShiftRight`, `ControlLeft`/`ControlRight`) are normalized to their base name (e.g., `Shift`, `Control`). Specifically, both `MetaLeft`/`MetaRight` and the now-deprecated `OSLeft`/`OSRight` are mapped to `Meta` for the Windows/Command key.
 
 
 ## License

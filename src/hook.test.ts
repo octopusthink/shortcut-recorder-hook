@@ -48,7 +48,7 @@ test('check shortcut registration', () => {
   expect(result.current.shortcut).toEqual(['Shift', 'KeyQ']);
 
   act(() => {
-    dispatchKeyDown('MetaLeft');
+    dispatchKeyDown('OSLeft'); // Meta and OS are treated same
   });
 
   expect(result.current.shortcut).toEqual(['Shift', 'Meta', 'KeyQ']);
