@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ShortcutRecorderError, ShortcutRecorderErrorCode, ShortcutRecorderOptions, ShortcutRecorderReturn } from './types';
 import { MOD_KEYS_MAP, MOD_KEYS_ORDER } from './constants';
-import { getFormattedError, getOrderedKeys, isModKey } from './utils';
+import { getFormattedError, getOrderedKeys, isModKey, isMacOS } from './utils';
 
 
 /**
@@ -30,7 +30,6 @@ const useShortcutRecorder = ({
   });
   const [activeModKeys, setActiveModKeys] = useState<Set<string>>(new Set());
   const [activeNonModKey, setActiveNonModKey] = useState<string>("");
-
 
 
   const excludedModKeysSet = new Set(
@@ -70,6 +69,7 @@ const useShortcutRecorder = ({
     excludedModKeysSet.clear();
   }
 
+  const isMac = isMacOS();
 
   const handleKeyDown = (e: KeyboardEvent): void => {
     if (!isRecording || !e) return;
@@ -134,6 +134,15 @@ const useShortcutRecorder = ({
     setActiveModKeys(prevModKeys => {
       const newModKeys = new Set(prevModKeys);
       if (isModKey(keycode) && !excludedModKeysSet.has(MOD_KEYS_MAP[keycode])) {
+        if (isMac && MOD_KEYS_MAP[keycode] === 'Meta') {
+          if (isValidShortcut()) {
+            onChange(shortcut);
+            setSavedShortcut(shortcut);
+            stopRecording();
+            return newModKeys;
+          }
+        }
+
         newModKeys.delete(MOD_KEYS_MAP[keycode]);
       }
       updateShortcutFromActiveKeys(newModKeys, activeNonModKey);
@@ -142,31 +151,57 @@ const useShortcutRecorder = ({
 
     setActiveNonModKey(prevNonModKey => {
       if (!isModKey(keycode) && !excludedKeysSet.has(keycode) && (!prevNonModKey || (prevNonModKey === keycode)) && shortcut.length > 0) {
-        const numModKeys = activeModKeys.size;
-
-        if (numModKeys < minModKeys) {
-          const err = getFormattedError(ShortcutRecorderErrorCode.MIN_MOD_KEYS_REQUIRED, { minModKeys });
-          setError(err);
-          resetRecording();
-          return ""
+        if (isValidShortcut()) {
+          onChange(shortcut);
+          setSavedShortcut(shortcut);
+          stopRecording();
         }
-
-        const shortcutStr = shortcut.join("");
-        if (excludedShortcutsSet.has(shortcutStr)) {
-          const err = getFormattedError(ShortcutRecorderErrorCode.SHORTCUT_NOT_ALLOWED, { shortcut });
-          setError(err);
-          resetRecording();
-          return ""
-        }
-
-        onChange(shortcut);
-        setSavedShortcut(shortcut);
-        stopRecording();
         return "";
       }
       return prevNonModKey;
     });
   };
+
+  const isValidShortcut = (): boolean => {
+    const numModKeys = activeModKeys.size;
+
+    if (numModKeys < minModKeys) {
+      const err = getFormattedError(ShortcutRecorderErrorCode.MIN_MOD_KEYS_REQUIRED, { minModKeys });
+      setError(err);
+      return false
+    }
+
+    if (numModKeys > maxModKeys) {
+      const err = getFormattedError(ShortcutRecorderErrorCode.MAX_MOD_KEYS_EXCEEDED, { maxModKeys });
+      setError(err);
+      return false
+    }
+
+    const shortcutStr = getOrderedKeys(activeNonModKey, activeModKeys).join("");
+    if (excludedShortcutsSet.has(shortcutStr)) {
+      const err = getFormattedError(ShortcutRecorderErrorCode.SHORTCUT_NOT_ALLOWED, { shortcut });
+      setError(err);
+      return false
+    }
+
+    for (const key of Array.from(activeModKeys)) {
+      if (excludedModKeysSet.has(key)) {
+        const err = getFormattedError(ShortcutRecorderErrorCode.MOD_KEY_NOT_ALLOWED, { modKey: key });
+        setError(err);
+        return false
+      }
+    }
+
+    if (!activeNonModKey) {
+      if (excludedKeysSet.has(activeNonModKey)) {
+      const err = getFormattedError(ShortcutRecorderErrorCode.KEY_NOT_ALLOWED, { keycode: activeNonModKey });
+        setError(err);
+      }
+      return false
+    }
+
+    return true
+  }
 
   // Update shortcut from active keys
   const updateShortcutFromActiveKeys = (modKeys: Set<string>, nonModKey: string): void => {

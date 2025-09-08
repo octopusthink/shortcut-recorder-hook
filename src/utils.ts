@@ -31,3 +31,18 @@ export const getOrderedKeys = (nonModKey: string | undefined, modKeys: Set<strin
     return orderedKeys;
 
 }
+
+export const isMacOS = (): boolean => {
+    const uaData = (navigator as Navigator & { userAgentData?: { platform?: string } }).userAgentData;
+
+    if (uaData?.platform) {
+      return uaData.platform === 'macOS';
+    }
+
+    if (navigator.platform && navigator.platform.toLowerCase().includes('mac')) {
+      return true;
+    }
+
+    return /mac/i.test(navigator.userAgent);
+
+  };

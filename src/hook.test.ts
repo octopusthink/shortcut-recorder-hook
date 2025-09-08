@@ -1,6 +1,7 @@
 import { renderHook, act } from '@testing-library/react';
 import useShortcutRecorder from './hook';
 import { ShortcutRecorderErrorCode } from './types';
+import { isMacOS } from './utils';
 
 // Function to trigger key events
 const dispatchKeyDown = (code: string) => {
@@ -48,7 +49,7 @@ test('check shortcut registration', () => {
   expect(result.current.shortcut).toEqual(['Shift', 'KeyQ']);
 
   act(() => {
-    dispatchKeyDown('OSLeft'); // Meta and OS are treated same
+    dispatchKeyDown('MetaLeft');
   });
 
   expect(result.current.shortcut).toEqual(['Shift', 'Meta', 'KeyQ']);
@@ -65,9 +66,15 @@ test('check shortcut registration', () => {
 
   expect(result.current.shortcut).toEqual(['Shift', 'Meta', 'KeyZ']);
 
-  act(() => {
-    dispatchKeyUp('KeyZ');
-  });
+  if (isMacOS()) {
+    act(() => {
+      dispatchKeyUp('MetaLeft');
+    });
+  } else {
+    act(() => {
+      dispatchKeyUp('KeyZ');
+    });
+  }
 
   act(() => {
     result.current.stopRecording();
@@ -81,7 +88,7 @@ test('check shortcut registration', () => {
 test('check excluded shortcuts', () => {
   const { result } = renderHook(() => useShortcutRecorder({
     excludedShortcuts: [
-      ['Alt', 'Space'],
+      ['Space', 'Alt', 'Control'],
     ],
   }));
 
@@ -99,13 +106,17 @@ test('check excluded shortcuts', () => {
   });
 
   act(() => {
+    dispatchKeyDown('ControlLeft');
+  });
+
+  act(() => {
     dispatchKeyUp('Space');
 
   });
 
   expect(result.current.error.code).toEqual(ShortcutRecorderErrorCode.SHORTCUT_NOT_ALLOWED);
 
-  expect(result.current.shortcut).toEqual([]);
+  expect(result.current.savedShortcut).toEqual([]);
 
   act(() => {
     result.current.stopRecording();
