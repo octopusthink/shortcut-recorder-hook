@@ -19,6 +19,7 @@ export interface ShortcutRecorderOptions {
   excludedKeys?: string[];
   minModKeys?: number;
   maxModKeys?: number;
+  allowEscapeKey?: boolean;
 }
 
 export interface ShortcutRecorderReturn {

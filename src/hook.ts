@@ -16,6 +16,7 @@ const useShortcutRecorder = ({
   excludedKeys = [],
   minModKeys = 0,
   maxModKeys = 4,
+  allowEscapeKey = false,
 }: ShortcutRecorderOptions = {}): ShortcutRecorderReturn => {
 
   if (maxModKeys < 0 || maxModKeys > 4) maxModKeys = 4;
@@ -80,7 +81,7 @@ const useShortcutRecorder = ({
 
     if (!keycode) return;
 
-    if (keycode === 'Escape') {
+    if (!allowEscapeKey && keycode === 'Escape') {
       stopRecording();
       return;
     }
@@ -129,7 +130,8 @@ const useShortcutRecorder = ({
 
     if (!keycode) return;
 
-    if (keycode === 'Escape') return;
+    if (!allowEscapeKey) {
+    if (keycode === 'Escape') return;}
 
     setActiveModKeys(prevModKeys => {
       const newModKeys = new Set(prevModKeys);
